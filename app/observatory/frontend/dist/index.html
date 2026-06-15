@@ -134,6 +134,9 @@
       Commander discovers peers, scores capability fit, recruits a shortlist,
       awards the strongest bid, then de-musters the rest. Reversible tools auto-pass;
       destructive tools block on the human key.
+      Responders run on three real runtimes (LangGraph · CrewAI · Pydantic AI) over one
+      Band substrate; the bid rule is a single deterministic <code>policy.make_bid</code> they
+      all share — runtimes differ, the decision rule is the same, for audit stability.
     </div>
   </section>
 
