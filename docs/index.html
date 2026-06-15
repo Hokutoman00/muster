@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MUSTER · Observatory (replay)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0c0d10; --panel:#131419; --line:#23252e; --ink:#e7e7e4;
+    --muted:#8b8d97; --accent:#e8913a; --ok:#5fb37a; --bad:#d6473f;
+    --r:3px; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--mono);
+       font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  header{display:flex;align-items:center;gap:14px;padding:12px 20px;
+         border-bottom:1px solid var(--line);flex-wrap:wrap}
+  header h1{font-size:15px;font-weight:700;letter-spacing:.04em;margin:0}
+  header h1 .dim{color:var(--muted);font-weight:400}
+  .badge{border:1px solid var(--line);border-radius:var(--r);color:var(--muted);
+         padding:3px 8px;font-size:11px;letter-spacing:.03em}
+  .spacer{flex:1}
+  .mode{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .seg{border:0;border-radius:0;background:var(--panel);color:var(--muted);
+       padding:7px 12px;font-size:12px;letter-spacing:.02em;cursor:pointer}
+  .seg:hover:not(.on){color:var(--ink)}
+  .seg.on{background:var(--accent);color:#11120f;font-weight:700}
+  .seg.on.naive{background:var(--bad);color:#fff}
+  body.naive{--accent:var(--bad)}
+  .btns{display:flex;gap:8px}
+  button{font-family:var(--mono);font-size:12px;color:var(--ink);
+         background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+         padding:7px 12px;cursor:pointer;letter-spacing:.02em}
+  button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .grid{display:grid;grid-template-columns:1fr 1fr 380px;gap:1px;
+        background:var(--line);height:calc(100vh - 54px)}
+  .grid>section{background:var(--bg);overflow:auto;padding:16px 18px}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);
+     margin:0 0 14px;font-weight:500}
+  .graph{position:relative;height:320px;margin-bottom:20px}
+  .node{position:absolute;width:138px;padding:9px 11px;border:1px solid var(--line);
+        border-radius:var(--r);background:var(--panel);transition:all .25s}
+  .node .role{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .node .name{font-weight:500;margin:2px 0;font-size:12px}
+  .node .fw{font-size:10px;color:var(--muted)}
+  .node .st{font-size:11px;color:var(--muted);margin-top:3px}
+  .node.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .node.active .st{color:var(--accent)}
+  .node.win{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok)}
+  .node.win .st{color:var(--ok)}
+  .node.out{opacity:.34;filter:saturate(.3)}
+  .node.bad{border-color:var(--bad)} .node.bad .st{color:var(--bad)}
+  svg.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .edge{stroke:var(--line);stroke-width:1.5;transition:stroke .25s}
+  .edge.on{stroke:var(--accent)} .edge.win{stroke:var(--ok)}
+  .legend{color:var(--muted);font-size:11px;margin-top:6px}
+  .legend code{color:var(--ink)}
+  .ns{margin-bottom:16px;border:1px solid var(--line);border-radius:var(--r);padding:12px}
+  .ns h3{margin:0 0 10px;font-size:12px;font-weight:500;display:flex;justify-content:space-between}
+  .ns h3 .tag{font-size:10px;color:var(--muted);letter-spacing:.08em}
+  .ns.offlimits{border-color:#3a2c2c}
+  .row{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+  .row b{color:var(--ink);font-weight:500}
+  .pill{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px}
+  .pill.ok{background:rgba(95,179,122,.13);color:var(--ok)}
+  .pill.bad{background:rgba(214,71,63,.14);color:var(--bad)}
+  .blastwrap{display:flex;align-items:baseline;gap:10px;margin:4px 0 2px}
+  .blast{font-size:34px;font-weight:700;line-height:1}
+  .blast.zero{color:var(--ok)} .blast.hot{color:var(--bad)}
+  .blastlab{color:var(--muted);font-size:11px}
+  .tl{display:flex;flex-direction:column;gap:0}
+  .ev{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);opacity:0;
+      transform:translateY(4px);transition:opacity .2s,transform .2s}
+  .ev.show{opacity:1;transform:none}
+  .ev .t{color:var(--muted);font-size:11px;min-width:54px}
+  .ev .lab{min-width:88px;font-size:11px;letter-spacing:.04em}
+  .ev .body{flex:1;color:var(--ink);word-break:break-word}
+  .lab.fipa{color:var(--accent)} .lab.cluster{color:var(--muted)}
+  .lab.win{color:var(--ok)} .lab.bad{color:var(--bad)}
+  .approve{margin:0 0 16px;border:1px solid var(--accent);border-radius:var(--r);
+           padding:12px;background:rgba(232,145,58,.07)}
+  .approve.hidden{display:none}
+  .approve .ttl{color:var(--accent);font-weight:500;margin-bottom:6px}
+  .ctrl{display:flex;gap:8px;align-items:center}
+  .ctrl .step{color:var(--muted);font-size:11px}
+</style>
+</head>
+<body>
+<header>
+  <h1>MUSTER <span class="dim">· Observatory</span></h1>
+  <span class="badge">replay · committed evidence · no backend</span>
+  <div class="spacer"></div>
+  <div class="mode" id="scenarioWrap" title="which incident to replay">
+    <button class="seg on" data-sc="workload">workload incident</button><button class="seg" data-sc="contested">contested · data</button>
+  </div>
+  <div class="mode" id="modeWrap" title="hardened muster vs naive control on the SAME fault">
+    <button class="seg on" id="modeHardened">hardened muster</button><button class="seg" id="modeNaive">naive control</button>
+  </div>
+  <div class="ctrl">
+    <button id="replay">&#8635; replay</button>
+    <span class="step" id="stepLabel"></span>
+  </div>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Dynamic Muster · Contract-Net over Band</h2>
+    <div id="approve" class="approve hidden">
+      <div class="ttl">&#9919; Human approval required</div>
+      <div id="approveBody"></div>
+    </div>
+    <div class="graph" id="graph"><svg class="edges" id="edges"></svg></div>
+    <div class="legend" id="legend">
+      Commander discovers peers over Band, scores capability fit, recruits a
+      shortlist, awards the strongest bid, then de-musters the rest. The three
+      responders run on three real runtimes (LangGraph &middot; CrewAI &middot; Pydantic AI)
+      but bind through ONE deterministic <code>policy.make_bid</code> &mdash; runtimes
+      differ, the decision rule does not.
+    </div>
+  </section>
+
+  <section>
+    <h2>Cluster &amp; Blast Radius (kind)</h2>
+    <div class="ns" id="ns-shop">
+      <h3><span>shop <span class="tag">in-scope</span></span><span id="shop-state" class="pill ok">healthy</span></h3>
+      <div class="row"><span>deploy/payments-api</span><b id="shop-payments">2/2 ready</b></div>
+      <div class="row"><span>remediation</span><b id="shop-rem">&mdash;</b></div>
+    </div>
+    <div class="ns offlimits" id="ns-billing">
+      <h3><span>billing <span class="tag">off-limits</span></span><span id="bill-state" class="pill ok">untouched</span></h3>
+      <div class="row"><span>deploy/ledger</span><b id="bill-ledger">1/1 ready</b></div>
+      <div class="row"><span>RBAC</span><b>API server denies cross-namespace writes (403)</b></div>
+    </div>
+    <div class="ns">
+      <h3><span>blast radius</span><span class="tag" id="blast-mode">hardened</span></h3>
+      <div class="blastwrap"><span class="blast zero" id="blast">0</span>
+        <span class="blastlab" id="blast-note">scoped remediation holds the blast at zero</span></div>
+      <div class="row"><span>destructive op</span><b id="destr">gated &mdash; blocked at human key</b></div>
+      <div class="row"><span>recovered to baseline</span><b id="recovered">yes</b></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coordination Timeline <span id="tl-src" style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">· p4 / p8 transcript</span></h2>
+    <div class="tl" id="tl"></div>
+  </section>
+</div>
+
+<script>
+/* ----- baked from committed spike evidence (no backend) -----------------
+   p4-commander.evidence.json  (single-winner workload incident)
+   p8-contested-award.evidence.json (contested arbitration on data incident)
+   p6-blast-contrast.evidence.json  (naive blast=2 vs hardened blast=0)
+   p3-responder-loop.evidence.json  (3 runtimes complete the loop)            */
+
+const RESPONDERS = {
+  workload: {role:"responder", name:"workload-responder", fw:"LangGraph"},
+  network:  {role:"responder", name:"network-responder",  fw:"CrewAI"},
+  data:     {role:"responder", name:"data-responder",     fw:"Pydantic AI"},
+};
+const POS = { // absolute positions inside .graph (px)
+  commander:[ "calc(50% - 69px)", 8 ],
+  workload :[ 4, 150 ],
+  network  :[ "calc(50% - 69px)", 230 ],
+  data     :[ "calc(100% - 142px)", 150 ],
+};
+
+// Hardened replay scripts (FIPA phases) per scenario, from the real transcript.
+const SCEN = {
+  workload: {
+    src:"p4 transcript",
+    recruited:["workload","data"], winner:"workload", demustered:["data"],
+    steps:[
+      {lab:"FIPA · announce", cls:"fipa", body:"INC-WL-P4 sev=high tags=[CrashLoopBackOff,rollout] capability_required=[rollout] posted as a Band task event", g:{active:["commander"]}},
+      {lab:"FIPA · discover", cls:"fipa", body:"commander discovers 3 external Band agents: workload / network / data responders", g:{active:["commander","workload","network","data"]}},
+      {lab:"triage · fit",   cls:"fipa", body:"capability fit -> workload=0.67, data=0.00, network=0.00 (selective muster, no fixed roster)", g:{active:["commander","workload"], out:["network"]}},
+      {lab:"recruit",        cls:"fipa", body:"@mention recruits the shortlist into the muster room: workload-responder, data-responder", g:{active:["commander","workload","data"], out:["network"]}},
+      {lab:"bid · LangGraph",cls:"fipa", body:"workload-responder BID fit=1.00 conf=0.99 blast~0 actions=[rollout_undo]", g:{active:["commander","data"], bid:["workload"], out:["network"]}},
+      {lab:"bid · PydanticAI",cls:"fipa",body:"data-responder NO-BID [pydantic-ai] no in-scope reversible tool for this signature (fit=0.00)", g:{active:["commander"], bid:["workload"], out:["network","data"]}},
+      {lab:"award",          cls:"win",  body:"award -> workload-responder, tool=rollout_undo (highest conf among handleable bids)", g:{win:["workload"], out:["network","data"]}},
+      {lab:"de-muster",      cls:"cluster", body:"data-responder removed from the muster room (lost the bid)", g:{win:["workload"], out:["network","data"]}},
+      {lab:"execute",        cls:"win",  body:"winner executes rollout_undo -> rolled deploy/payments-api back to previous ReplicaSet", g:{win:["workload"], out:["network","data"]}, cluster:"fix"},
+      {lab:"recovered",      cls:"win",  body:"cluster verified healthy; blast radius = 0; billing untouched", g:{win:["workload"], out:["network","data"]}, cluster:"recovered"},
+    ],
+  },
+  contested: {
+    src:"p8 transcript",
+    recruited:["workload","network","data"], winner:"data", demustered:["workload","network"],
+    steps:[
+      {lab:"FIPA · announce", cls:"fipa", body:"INC-CONTESTED-P8 sev=high scope=[data] tags=[CrashLoopBackOff,readiness,configmap] capability_required=[configmap]", g:{active:["commander"]}},
+      {lab:"FIPA · discover", cls:"fipa", body:"commander discovers 3 external Band agents over Band peers", g:{active:["commander","workload","network","data"]}},
+      {lab:"recruit",         cls:"fipa", body:"all three recruited — this signature is genuinely contested (multiple plausible handlers)", g:{active:["commander","workload","network","data"]}},
+      {lab:"bid · PydanticAI",cls:"fipa", body:"data-responder BID can_handle=true fit=0.50 conf=0.99 blast~0 (correct root cause: bad configmap)", g:{active:["commander","workload","network"], bid:["data"]}},
+      {lab:"bid · LangGraph", cls:"fipa", body:"workload-responder BID can_handle=true fit=0.14 conf=0.64 blast~0 actions=[rollout_undo]", g:{active:["commander","network"], bid:["data","workload"]}},
+      {lab:"bid · CrewAI",    cls:"fipa", body:"network-responder NO-BID can_handle=false fit=0.00 (no in-scope reversible action)", g:{active:["commander"], bid:["data","workload"], out:["network"]}},
+      {lab:"arbitrate",       cls:"win",  body:"2 handleable bids -> rule: highest confidence among handleable, tie-broken by lowest blast", g:{bid:["data","workload"], out:["network"]}},
+      {lab:"award",           cls:"win",  body:"award -> data-responder (conf=0.99 > 0.64). Runner-up: workload-responder. Arbitration discriminated between competitors.", g:{win:["data"], out:["network","workload"]}},
+      {lab:"de-muster",       cls:"cluster", body:"workload + network removed from the muster room (lost the contested bid)", g:{win:["data"], out:["network","workload"]}},
+      {lab:"recovered",       cls:"win",  body:"winner (correct root cause) executes; cluster recovered; blast=0; billing untouched", g:{win:["data"], out:["network","workload"]}, cluster:"recovered"},
+    ],
+  },
+};
+
+// Naive control: one lone unscoped operator on the SAME workload fault (p6).
+const NAIVE_STEPS = [
+  {lab:"naive · start", cls:"bad", body:"single operator, full cluster access, NO RBAC scope, NO human gate — same workload fault", g:{active:["commander"]}},
+  {lab:"naive · act",   cls:"bad", body:"rollout restart deployment --all in [billing, shop] — no namespace scope, so it touches off-limits billing", g:{bad:["commander"]}, cluster:"touch-billing"},
+  {lab:"naive · act",   cls:"bad", body:"scale deploy/payments-api --replicas=0  (DESTRUCTIVE, unapproved — no gate to stop it)", g:{bad:["commander"]}, cluster:"destructive"},
+  {lab:"blast", cls:"bad", body:"off-limits touched=[deploy/ledger]; destructive unapproved=1; blast radius = 2; recovered=false", g:{bad:["commander"]}, cluster:"blast2"},
+];
+
+const $=s=>document.querySelector(s), graph=$("#graph"), edges=$("#edges"), tl=$("#tl");
+let SCENARIO="workload", MODE="hardened", timer=null;
+
+function nodeEl(key, def){
+  const d=document.createElement("div"); d.className="node"; d.id="n-"+key;
+  d.style.left = typeof POS[key][0]==="number" ? POS[key][0]+"px" : POS[key][0];
+  d.style.top  = POS[key][1]+"px";
+  d.innerHTML = `<div class="role">${def.role}</div><div class="name">${def.name}</div>`+
+    (def.fw?`<div class="fw">${def.fw}</div>`:``)+`<div class="st">idle</div>`;
+  return d;
+}
+function buildGraph(){
+  [...graph.querySelectorAll(".node")].forEach(n=>n.remove());
+  graph.appendChild(nodeEl("commander",{role:"commander",name:"muster-commander",fw:"Contract-Net"}));
+  for(const k of ["workload","network","data"]) graph.appendChild(nodeEl(k,RESPONDERS[k]));
+  drawEdges();
+}
+function center(el){const g=graph.getBoundingClientRect(),r=el.getBoundingClientRect();
+  return {x:r.left-g.left+r.width/2, y:r.top-g.top+r.height/2};}
+function drawEdges(state){
+  edges.innerHTML="";
+  const c=$("#n-commander"); if(!c) return;
+  for(const k of ["workload","network","data"]){
+    const n=$("#n-"+k); if(!n) continue;
+    const a=center(c), b=center(n);
+    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",a.x);line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b.x);line.setAttribute("y2",b.y);
+    let cls="edge";
+    if(state){ if(state.win&&state.win.includes(k))cls="edge win";
+      else if((state.bid&&state.bid.includes(k))||(state.active&&state.active.includes(k)))cls="edge on"; }
+    line.setAttribute("class",cls); edges.appendChild(line);
+  }
+}
+function applyGraph(g){
+  for(const k of ["commander","workload","network","data"]){
+    const n=$("#n-"+k); if(!n) continue;
+    n.className="node"; const st=n.querySelector(".st"); let label="idle";
+    if(g){
+      if(g.out&&g.out.includes(k)){n.classList.add("out");label="de-mustered";}
+      if(g.active&&g.active.includes(k)){n.classList.add("active");label="active";}
+      if(g.bid&&g.bid.includes(k)){n.classList.add("active");label="bid in";}
+      if(g.win&&g.win.includes(k)){n.classList.remove("out");n.classList.add("win");label="WINNER";}
+      if(g.bad&&g.bad.includes(k)){n.classList.add("bad");label="unscoped";}
+    }
+    if(k!=="commander"||label!=="idle") st.textContent=label;
+  }
+  drawEdges(g);
+}
+function setBlast(n,note,destr,recovered,billing){
+  const b=$("#blast"); b.textContent=n; b.className="blast "+(n>0?"hot":"zero");
+  $("#blast-note").textContent=note; $("#destr").textContent=destr;
+  $("#recovered").textContent=recovered;
+  $("#blast-mode").textContent=MODE;
+  const bs=$("#bill-state"), bl=$("#bill-ledger");
+  if(billing==="hit"){bs.className="pill bad";bs.textContent="touched";bl.textContent="0/1 — restarted by unscoped op";}
+  else{bs.className="pill ok";bs.textContent="untouched";bl.textContent="1/1 ready";}
+}
+function cluster(stage){
+  const sp=$("#shop-payments"), sr=$("#shop-rem"), ss=$("#shop-state");
+  if(stage==="fix"){sr.textContent="rollout_undo (reversible)";}
+  if(stage==="recovered"){sp.textContent="2/2 ready";sr.textContent="rollout_undo — verified healthy";ss.className="pill ok";ss.textContent="healthy";
+    setBlast(0,"scoped remediation holds the blast at zero","gated — blocked at human key","yes","untouched");}
+  if(stage==="touch-billing"){setBlast(1,"naive op restarted off-limits billing","not gated — naive has no key check","pending","hit");}
+  if(stage==="destructive"){sp.textContent="0/2 — scaled to zero (unapproved)";ss.className="pill bad";ss.textContent="degraded";
+    setBlast(2,"naive control: unscoped + no human gate","executed unapproved (scale to 0)","no","hit");}
+  if(stage==="blast2"){setBlast(2,"off-limits touched + destructive unapproved","executed unapproved","no","hit");}
+}
+function addEvent(s,t){
+  const e=document.createElement("div"); e.className="ev";
+  e.innerHTML=`<span class="t">${t}</span><span class="lab ${s.cls}">${s.lab}</span><span class="body">${s.body}</span>`;
+  tl.prepend(e); requestAnimationFrame(()=>e.classList.add("show"));
+}
+
+function reset(){
+  if(timer){clearTimeout(timer);timer=null;}
+  tl.innerHTML=""; buildGraph();
+  $("#approve").classList.add("hidden");
+  $("#shop-payments").textContent="2/2 ready"; $("#shop-rem").textContent="—";
+  $("#shop-state").className="pill ok"; $("#shop-state").textContent="healthy";
+  setBlast(0,"scoped remediation holds the blast at zero","gated — blocked at human key","yes","untouched");
+  $("#tl-src").textContent = "· "+(MODE==="naive"?"p6 naive control":SCEN[SCENARIO].src);
+}
+function play(){
+  reset();
+  const steps = MODE==="naive" ? NAIVE_STEPS : SCEN[SCENARIO].steps;
+  let i=0; const t0=Date.now();
+  const tick=()=>{
+    if(i>=steps.length){$("#stepLabel").textContent="done";return;}
+    const s=steps[i]; const secs=((Date.now()-t0)/1000+0.3*i).toFixed(1);
+    const t=("00:0"+Math.min(9,Math.floor(i*0.7))).slice(-5);
+    applyGraph(s.g); addEvent(s,t);
+    if(s.cluster) cluster(s.cluster);
+    // human gate visualised when hardened hits the destructive step (it never does here:
+    // hardened blocks BEFORE acting). Show the gate panel briefly on award in hardened.
+    if(MODE==="hardened" && s.lab==="execute"){
+      const ap=$("#approve"); ap.classList.remove("hidden");
+      $("#approveBody").textContent="reversible tool (rollout_undo) auto-passes; a destructive op here would block on the human key.";
+      setTimeout(()=>ap.classList.add("hidden"),2600);
+    }
+    $("#stepLabel").textContent=`${i+1}/${steps.length}`;
+    i++; timer=setTimeout(tick, 1100);
+  };
+  tick();
+}
+
+// wiring
+$("#scenarioWrap").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-sc]"); if(!b)return;
+  [...$("#scenarioWrap").children].forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); SCENARIO=b.dataset.sc; if(MODE!=="naive") play();
+});
+$("#modeHardened").addEventListener("click",()=>{MODE="hardened";document.body.classList.remove("naive");
+  $("#modeHardened").classList.add("on");$("#modeNaive").classList.remove("on","naive");play();});
+$("#modeNaive").addEventListener("click",()=>{MODE="naive";document.body.classList.add("naive");
+  $("#modeNaive").classList.add("on","naive");$("#modeHardened").classList.remove("on");play();});
+$("#replay").addEventListener("click",play);
+window.addEventListener("resize",()=>drawEdges());
+buildGraph(); play();
+</script>
+</body>
+</html>

@@ -19,6 +19,12 @@ invariants that make the coordination real (not a thin wrapper / final notify):
      (workload=0.67, data=0.00, network=0.00 -> data NO-BIDs).
   5. Three runtimes, one rule: bids arrive from langgraph / crewai / pydantic-ai
      responders, all binding through the single shared deterministic bid policy.
+  6. Contested arbitration is real: on an incident two specialists can both
+     handle, the SAME shared rule (highest confidence among handleable bids,
+     tie-broken by lowest blast) is re-applied here from the raw bids and must
+     independently reproduce the recorded winner -- the correct root cause,
+     beating a heterogeneous-runtime competitor. Award discriminates; it is not
+     a rubber stamp.
 
 Exit code is non-zero if any invariant fails, so it is safe to gate a demo on.
 """
@@ -111,6 +117,37 @@ def main() -> int:
     ok(f"three runtimes complete CFP->bid->award->execute->recover: {frameworks}")
     print(f"{DIM}    (all three bind through ONE shared deterministic bid policy --{RESET}")
     print(f"{DIM}     runtimes differ, the decision rule does not, for audit stability){RESET}")
+
+    # ---- 6: contested arbitration re-derived from raw bids (p8) -------------
+    p8 = load(spikes / "p8-contested-award.evidence.json")
+    bids8 = p8.get("bids", [])
+    handleable = [b for b in bids8 if b.get("can_handle")]
+    if len(handleable) < 2:
+        fail(f"p8 is not genuinely contested: {len(handleable)} handleable bid(s)")
+    # Re-apply the shared rule ourselves -- do NOT trust the recorded `award`.
+    # rule: highest confidence among handleable bids, tie-broken by lowest blast.
+    derived = max(handleable,
+                  key=lambda b: (b.get("confidence", 0), -b.get("estimated_blast", 0)))
+    recorded_winner = p8.get("award", {}).get("winner")
+    if derived["responder"] != recorded_winner:
+        fail(f"shared rule re-derivation picked {derived['responder']!r} "
+             f"but evidence recorded {recorded_winner!r}")
+    # the winner must be the correct root cause for a data/configmap incident
+    scope = set(p8.get("incident", {}).get("scope", []))
+    if "data" not in scope or "data-responder" not in derived["responder"]:
+        fail(f"winner {derived['responder']!r} is not the correct root cause for "
+             f"scope={sorted(scope)}")
+    # arbitration discriminated between distinct, heterogeneous-runtime competitors
+    runner_up = max((b for b in handleable if b is not derived),
+                    key=lambda b: b.get("confidence", 0))
+    if runner_up["framework"] == derived["framework"]:
+        fail("contested winner and runner-up are the same runtime -- not heterogeneous")
+    print(f"{DIM}    contested: {len(handleable)} handleable bids "
+          f"({derived['framework']} conf={derived['confidence']} vs "
+          f"{runner_up['framework']} conf={runner_up['confidence']}){RESET}")
+    ok(f"contested arbitration: shared rule independently re-picks the correct "
+       f"root cause ({derived['responder'].split('/')[-1]}) over a "
+       f"{runner_up['framework']} competitor")
 
     print(f"\n{GREEN}{BOLD}PASS{RESET} Band coordination keystone re-derived offline from "
           f"committed evidence.")
