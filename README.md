@@ -25,7 +25,11 @@ and the coordination timeline — muster → bids → award → reversible execu
 recovered (right). [`assets/observatory.png`](assets/observatory.png) is a captured
 fallback in case the public URL is unreachable at judging time.*
 
-Open the public observatory, pick the **workload** incident, and fire it twice:
+**Two ways to see it, no setup:**
+- **Touch it live** — [the public observatory](https://hokutolaptop.tailf0bca1.ts.net) drives a *real* `kind` cluster: inject an incident and flip the toggle yourself.
+- **Always-on replay (never down)** — **https://hokutoman00.github.io/muster/** is a static GitHub Pages page that replays the *committed* spike evidence (the real Band transcript) in the same observatory, with the same working naive↔hardened toggle and two scenarios (single-winner + contested arbitration). No backend, no credentials, no laptop required — so the keystone is verifiable even if the live node is asleep at judging time.
+
+Open the public observatory (or the always-on replay), pick the **workload** incident, and fire it twice:
 
 | | **naive control** (deterministic single-operator baseline: full cluster access, no scope, no gate) | **hardened muster** (MUSTER) |
 |--|--|--|
@@ -311,7 +315,8 @@ Band keys.
 
 - **Cover image:** [`assets/cover.png`](assets/cover.png)
 - **Slide deck:** [`assets/deck.pdf`](assets/deck.pdf) (8 slides)
-- **Live observatory:** https://hokutolaptop.tailf0bca1.ts.net — the real kind cluster, served over a public Tailscale Funnel URL. Inject an incident and flip naive↔hardened yourself; the blast-radius numbers are measured live. _(Served from the author's node; if it is briefly unreachable, `make observatory` reproduces it locally against a `kind` cluster — see Run it.)_
+- **Live observatory:** https://hokutolaptop.tailf0bca1.ts.net — the real kind cluster, served over a public Tailscale Funnel URL. Inject an incident and flip naive↔hardened yourself; the blast-radius numbers are measured live. _(Served from the author's node; if it is briefly unreachable, use the always-on replay below or `make observatory` to reproduce locally against a `kind` cluster — see Run it.)_
+- **Always-on replay:** https://hokutoman00.github.io/muster/ — the same observatory UI + naive↔hardened toggle, replaying the committed spike evidence as a static GitHub Pages page. No backend/creds/laptop; up whenever GitHub is up.
 - **Demo video:** https://youtu.be/haf6QRBlfyI (3:02, unlisted)
 
 > The cover and deck are generated from source (`assets/cover.html`, `assets/deck.html`)
