@@ -312,7 +312,7 @@ Band keys.
 - **Cover image:** [`assets/cover.png`](assets/cover.png)
 - **Slide deck:** [`assets/deck.pdf`](assets/deck.pdf) (8 slides)
 - **Live observatory:** https://hokutolaptop.tailf0bca1.ts.net — the real kind cluster, served over a public Tailscale Funnel URL. Inject an incident and flip naive↔hardened yourself; the blast-radius numbers are measured live. _(Served from the author's node; if it is briefly unreachable, `make observatory` reproduces it locally against a `kind` cluster — see Run it.)_
-- **Demo video:** _(see the submission page)_
+- **Demo video:** https://youtu.be/haf6QRBlfyI (3:02, unlisted)
 
 > The cover and deck are generated from source (`assets/cover.html`, `assets/deck.html`)
 > with `node assets/_render.mjs`, so they stay in sync with the measured numbers above.
