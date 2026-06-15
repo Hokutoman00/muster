@@ -30,6 +30,20 @@
 
 design.md §11 の「実機未確認」3項（Band の discovery / handoff / 実行トレースが本当に存在するか）を、上表の live 観測で充足。設計の前提（Contract-Net 写像）は仮説でなく実機で成立する。
 
+## スパイクごとの注入シナリオ（数値が違って見える理由）
+
+各スパイクは**独立した注入シナリオ**で別々のことを証明している。だから fit スコアや
+namespace が spike 間で異なるのは想定通りで、不整合ではない:
+
+| spike | 注入シナリオ | namespace | fit（例） | 何を証明 |
+|---|---|---|---|---|
+| p1 | 疎通確認用のサンプル CFP（pod CrashLoopBackOff） | `payments` | bid `fit=0.92` | Band REST 1周（announce→bid→read）が live で通る |
+| p3/p4 | 本番の shop workload インシデント | `shop` | `workload=0.67 / data=0.00 / network=0.00` | 選択的 muster（fit>0 のみ招集）＋3ランタイム1ルール |
+
+p1 の `fit=0.92`／`ns=payments` は**疎通スパイク専用の説明用シナリオ**であって、
+コミットされた本番インシデント（p3/p4 の shop, `workload=0.67`）とは別物。
+`verify_coordination.py` は各 spike をその spike 固有の不変条件でだけ検証する。
+
 ## 次（P2〜）
 
 - responder の実体は thenvoi SDK アダプタ（LangGraph/CrewAI/Pydantic AI）で messages/next をポーリングし、kubectl 可逆アクションを実行 → tool_call/tool_result event を流す。
