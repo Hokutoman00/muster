@@ -1,0 +1,147 @@
+{
+  "results": {
+    "workload": true,
+    "network": true,
+    "data": true
+  },
+  "steps": [
+    {
+      "step": "workload.chaos_injected",
+      "incident": "INC-WL",
+      "observed": true
+    },
+    {
+      "step": "workload.cfp_announced",
+      "chat_id": "983379cf-8843-435d-9cd6-29724ff2de38"
+    },
+    {
+      "step": "workload.recruited",
+      "responder": "hokutoman00/workload-responder"
+    },
+    {
+      "step": "workload.framework",
+      "framework": "langgraph"
+    },
+    {
+      "step": "workload.bid",
+      "out": {
+        "message_id": "e0ef1dde-9ada-4a57-9d9b-7e00f9a36b7a",
+        "action": "bid",
+        "bid": "@hokutoman00/muster-commander BID fit=1.00 conf=0.99 blast~0 actions=[rollout_undo]"
+      }
+    },
+    {
+      "step": "workload.awarded",
+      "award": {
+        "winner": "hokutoman00/workload-responder",
+        "tool": "rollout_undo",
+        "args": {}
+      },
+      "bids_seen": 1
+    },
+    {
+      "step": "workload.executed",
+      "out": {
+        "message_id": "add20d2e-5711-4625-bbf4-42c2d41d60ce",
+        "action": "executed",
+        "result": "rolled deploy/payments-api back to previous ReplicaSet"
+      }
+    },
+    {
+      "step": "workload.recovered",
+      "recovered": true
+    },
+    {
+      "step": "network.chaos_injected",
+      "incident": "INC-NW",
+      "observed": true
+    },
+    {
+      "step": "network.cfp_announced",
+      "chat_id": "333379e3-3f15-4fb1-b7e9-cff24b30127e"
+    },
+    {
+      "step": "network.recruited",
+      "responder": "hokutoman00/network-responder"
+    },
+    {
+      "step": "network.framework",
+      "framework": "crewai"
+    },
+    {
+      "step": "network.bid",
+      "out": {
+        "message_id": "ba4a9996-2189-45c1-8078-bf100614fc24",
+        "action": "bid",
+        "bid": "@hokutoman00/muster-commander BID fit=0.67 conf=0.99 blast~0 actions=[restore_selector]"
+      }
+    },
+    {
+      "step": "network.awarded",
+      "award": {
+        "winner": "hokutoman00/network-responder",
+        "tool": "restore_selector",
+        "args": {}
+      },
+      "bids_seen": 1
+    },
+    {
+      "step": "network.executed",
+      "out": {
+        "message_id": "27a8fc02-62c6-4aac-9ace-3f4fdf1096e9",
+        "action": "executed",
+        "result": "restored svc/checkout-web selector -> app=checkout-web"
+      }
+    },
+    {
+      "step": "network.recovered",
+      "recovered": true
+    },
+    {
+      "step": "data.chaos_injected",
+      "incident": "INC-DA",
+      "observed": true
+    },
+    {
+      "step": "data.cfp_announced",
+      "chat_id": "0c644d1e-3b02-4b52-a082-07aa4da3cd73"
+    },
+    {
+      "step": "data.recruited",
+      "responder": "hokutoman00/data-responder"
+    },
+    {
+      "step": "data.framework",
+      "framework": "pydantic-ai"
+    },
+    {
+      "step": "data.bid",
+      "out": {
+        "message_id": "b0086890-2158-406b-9a19-a6eb9833652d",
+        "action": "bid",
+        "bid": "@hokutoman00/muster-commander BID fit=0.67 conf=0.99 blast~0 actions=[restore_configmap]"
+      }
+    },
+    {
+      "step": "data.awarded",
+      "award": {
+        "winner": "hokutoman00/data-responder",
+        "tool": "restore_configmap",
+        "args": {}
+      },
+      "bids_seen": 1
+    },
+    {
+      "step": "data.executed",
+      "out": {
+        "message_id": "25fc4c1d-d930-408a-ad07-2fc2f47f8017",
+        "action": "executed",
+        "result": "restored catalog-config marker + restarted deploy/catalog-svc"
+      }
+    },
+    {
+      "step": "data.recovered",
+      "recovered": true
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#11151c; --ink:#e7e9ec; --mut:#8b929c;
+    --line:#222831; --accent:#e6a23c; --fail:#c0564b; --ok:#5bbf8a;
+    --mono:'JetBrains Mono','Cascadia Code',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  @page{ size:1280px 720px; margin:0 }
+  html,body{background:var(--bg)}
+  body{font-family:var(--mono);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .slide{
+    width:1280px;height:720px;padding:64px 76px;position:relative;
+    page-break-after:always;display:flex;flex-direction:column;overflow:hidden;
+    background:radial-gradient(1100px 460px at 82% -12%, #161b24 0%, transparent 60%), var(--bg);
+  }
+  .slide:last-child{page-break-after:auto}
+  .num{position:absolute;top:30px;right:40px;font-size:13px;color:var(--mut);letter-spacing:.1em}
+  .brand{position:absolute;top:30px;left:76px;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut)}
+  .brand b{color:var(--accent);font-weight:700}
+  h1{font-size:46px;font-weight:800;letter-spacing:.01em;line-height:1.05;margin-bottom:8px}
+  h1 .ac{color:var(--accent)}
+  .eyebrow{font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;margin-top:26px}
+  p{font-size:20px;line-height:1.6;color:var(--ink)}
+  p.mut{color:var(--mut)}
+  ul{list-style:none;margin-top:14px}
+  li{font-size:20px;line-height:1.65;color:var(--ink);padding-left:26px;position:relative;margin-bottom:10px}
+  li::before{content:"▸";position:absolute;left:0;color:var(--accent)}
+  li span{color:var(--mut)}
+  .center{justify-content:center}
+  .big-title{font-size:108px;font-weight:800;color:var(--accent);line-height:.92;letter-spacing:.02em}
+  .big-title .dot{color:var(--ink)}
+  .lead{font-size:30px;color:var(--ink);margin-top:16px;font-weight:500}
+  .sub{font-size:18px;color:var(--mut);margin-top:18px;max-width:840px;line-height:1.6}
+  .hl{color:var(--accent)}
+  .ok{color:var(--ok)} .fail{color:var(--fail)}
+
+  table{border-collapse:collapse;margin-top:22px;width:100%;font-size:19px}
+  th,td{border:1px solid var(--line);padding:12px 16px;text-align:left}
+  th{color:var(--mut);font-weight:600;font-size:15px;letter-spacing:.04em;background:var(--panel)}
+  td.k{color:var(--mut)}
+  .blast-n{color:var(--fail);font-weight:800;font-size:24px}
+  .blast-h{color:var(--ok);font-weight:800;font-size:24px}
+
+  .flow{display:flex;align-items:stretch;gap:14px;margin-top:26px;flex-wrap:wrap}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:16px 18px;flex:1;min-width:150px}
+  .box h3{font-size:15px;color:var(--accent);letter-spacing:.04em;margin-bottom:8px;font-weight:700}
+  .box p{font-size:14px;color:var(--mut);line-height:1.5}
+  .arrow{display:flex;align-items:center;color:var(--mut);font-size:24px}
+
+  .two{display:flex;gap:30px;margin-top:22px}
+  .col{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:22px 24px}
+  .col h3{font-size:18px;margin-bottom:12px}
+  code{background:#0a0d12;border:1px solid var(--line);border-radius:3px;padding:2px 7px;font-size:16px;color:var(--ink)}
+  .foot{position:absolute;bottom:30px;left:76px;font-size:14px;color:var(--mut)}
+  .chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}
+  .chip{font-size:14px;color:var(--mut);border:1px solid var(--line);border-radius:3px;padding:5px 11px;background:var(--panel)}
+  .chip b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- 1. Title -->
+<section class="slide center">
+  <div class="brand"><b>MUSTER</b></div>
+  <div class="num">Band of Agents · lablab.ai</div>
+  <div class="big-title">MUSTER<span class="dot">.</span></div>
+  <div class="lead">the war-room that musters its own responders</div>
+  <div class="sub">
+    A real Kubernetes incident fires &rarr; MUSTER musters a minimal shortlist and keeps
+    <span class="hl">only</span> the specialist that incident needs (a real Contract-Net
+    contest over Band's primitives) &rarr; repairs the real cluster with reversible actions,
+    human-gated on anything destructive.
+  </div>
+  <div class="chips">
+    <span class="chip"><b>Band</b> coordination layer</span>
+    <span class="chip">Contract-Net (FIPA)</span>
+    <span class="chip">LangGraph · CrewAI · Pydantic AI</span>
+    <span class="chip">Kubernetes RBAC</span>
+  </div>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">2</div>
+  <div class="eyebrow">The problem</div>
+  <h1>Incident response is a <span class="ac">fixed panel</span> with the safety off</h1>
+  <ul style="margin-top:24px">
+    <li>Most multi-agent demos show a <span>fixed roster of agents talking</span> — the same panel convenes for every problem, whether it fits or not.</li>
+    <li>An unscoped operator (human or agent) under pressure touches things it shouldn't — <span>off-limits namespaces, irreversible scale-downs</span> — and the blast radius is the whole cluster.</li>
+    <li>"Human-in-the-loop" is usually a <span>label on a slide</span>, not a key the human actually holds at the moment of a destructive action.</li>
+  </ul>
+  <p class="mut" style="margin-top:26px">Enterprise incident coordination needs the <span class="hl">right responders only</span>, real repair, and a hard safety boundary — verifiable, not asserted.</p>
+</section>
+
+<!-- 3. Differentiation -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">3</div>
+  <div class="eyebrow">The displacement</div>
+  <h1>No roster. The <span class="ac">incident</span> decides who is mustered.</h1>
+  <div class="two">
+    <div class="col">
+      <h3 class="mut">Field's modal solution</h3>
+      <p class="mut">A fixed 3–5 agent governance/review panel that always convenes and chats. Coordination is decorative; the roster is static.</p>
+    </div>
+    <div class="col">
+      <h3 class="ac">MUSTER</h3>
+      <p>Reads the fault signature, scores responder <span class="hl">fit</span> (Jaccard of symptom vs capability tags), and musters <span class="hl">only</span> the matching responders via Band — a <code>workload-only</code> signature musters just the WorkloadResponder.</p>
+    </div>
+  </div>
+  <p class="mut" style="margin-top:24px">Selective muster + reversible real infra + a human-held key + a public URL the judge can fire themselves — that is the differentiation, measured not claimed.</p>
+</section>
+
+<!-- 4. How it works -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">4</div>
+  <div class="eyebrow">How it works</div>
+  <h1>Contract-Net, mapped onto <span class="ac">real Band primitives</span></h1>
+  <div class="flow">
+    <div class="box"><h3>Announce</h3><p>Commander posts a CFP — <code>create_chat_event(task)</code></p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box"><h3>Discover + score</h3><p><code>list_peers()</code>, then Jaccard fit on symptom × capability tags</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box"><h3>Bid + award</h3><p>Responders bid over chat messages; Commander awards the winner</p></div>
+    <div class="arrow">&rarr;</div>
+    <div class="box"><h3>Muster + handoff</h3><p><code>add/remove participant</code>; handoff by <code>@mention</code></p></div>
+  </div>
+  <p class="mut" style="margin-top:28px">
+    Commander + responders run as <span class="hl">distinct Band identities</span> — coordination genuinely flows as Band chat events &amp; messages between them, not in-process calls.
+    Responders run on three <span class="hl">real runtimes</span> (LangGraph / CrewAI / Pydantic AI) on one coordination substrate.
+  </p>
+  <p class="mut" style="margin-top:10px;font-size:16px">Honest scope: the bid rule is one deterministic <code>policy.make_bid</code>; runtimes differ, the decision rule is shared (reasoning lives in the Commander).</p>
+</section>
+
+<!-- 5. Safety -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">5</div>
+  <div class="eyebrow">Safety that the cluster enforces</div>
+  <h1>The boundary is the <span class="ac">Kubernetes API server</span>, not Python</h1>
+  <ul style="margin-top:22px">
+    <li><b>Scoped by RBAC.</b> <span>The hardened responder authenticates as a namespaced ServiceAccount (<code>responder-shop</code>, Role+RoleBinding in <code>shop</code> only).</span></li>
+    <li><b>Off-limits is API-Forbidden.</b> <span>Any read/write to the <code>billing</code> namespace returns <span class="fail">403 Forbidden</span> from the API server — regardless of what the agent code attempts.</span></li>
+    <li><b>Reversible only.</b> <span>Every remediation is a <code>kubectl</code> action with a known inverse (rollout undo / scale / image revert). No simulation.</span></li>
+    <li><b>Human holds the key.</b> <span>Destructive kinds (e.g. <code>scale --replicas=0</code>) block on a real human ack — the gate refuses, it doesn't just warn.</span></li>
+  </ul>
+  <p class="mut" style="margin-top:22px">Proof on the live cluster: <code>python -m common.k8s rbac</code> &rarr; <span class="ok">boundary_holds: true</span> (shop patch ok · billing read 403 · admin control can still read billing).</p>
+</section>
+
+<!-- 6. Proof -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">6</div>
+  <div class="eyebrow">The proof — measured, repeatable</div>
+  <h1>Same real fault. <span class="fail">Naive blast 2</span> &rarr; <span class="ok">hardened blast 0</span>.</h1>
+  <table>
+    <tr><th></th><th>naive control (full access, no scope, no gate)</th><th>hardened muster (MUSTER)</th></tr>
+    <tr><td class="k">who acts</td><td>one operator, full cluster access</td><td>only the mustered responder, scoped to its namespace</td></tr>
+    <tr><td class="k">destructive op</td><td>runs unapproved (<code>scale 0</code>)</td><td><span class="ok">blocked</span>, waits for the human key</td></tr>
+    <tr><td class="k">off-limits <code>billing</code></td><td>touched (<code>deploy/ledger</code>)</td><td>untouched</td></tr>
+    <tr><td class="k">blast radius</td><td><span class="blast-n">2</span></td><td><span class="blast-h">0</span></td></tr>
+    <tr><td class="k">recovered</td><td><span class="fail">✗</span></td><td><span class="ok">✓</span></td></tr>
+  </table>
+  <p class="mut" style="margin-top:20px">Re-derive it from scratch in one command: <code>bash scripts/demo.sh</code> — brings up the kind cluster, runs the contrast on the same injected fault (exits non-zero unless it holds), prints the RBAC self-test. No Band credentials needed.</p>
+</section>
+
+<!-- 7. Business value -->
+<section class="slide">
+  <div class="brand"><b>MUSTER</b></div><div class="num">7</div>
+  <div class="eyebrow">Why it matters</div>
+  <h1>Coordination you can <span class="ac">audit</span>, repair you can <span class="ac">trust</span></h1>
+  <ul style="margin-top:24px">
+    <li><b>Less manual coordination.</b> <span>The incident signature recruits the right specialists automatically — no human paging a fixed on-call panel.</span></li>
+    <li><b>Bounded blame radius.</b> <span>RBAC-scoped responders mean a misfire can't cross into regulated/off-limits systems — a hard requirement for high-stakes enterprise ops.</span></li>
+    <li><b>Trustworthy autonomy.</b> <span>Reversible actions + a human-held destructive key make agentic remediation deployable where "let the agent run" otherwise isn't.</span></li>
+    <li><b>Transparent by construction.</b> <span>Every muster, bid, award and tool call streams to a public observatory — the coordination is the evidence.</span></li>
+  </ul>
+</section>
+
+<!-- 8. Close -->
+<section class="slide center">
+  <div class="brand"><b>MUSTER</b></div><div class="num">8</div>
+  <div class="big-title" style="font-size:84px">Fire it yourself.</div>
+  <p class="lead" style="margin-top:18px">Pick the workload incident · flip naive &harr; hardened · watch blast <span class="fail">2</span> &rarr; <span class="ok">0</span> on the real cluster.</p>
+  <div class="chips" style="margin-top:30px">
+    <span class="chip"><b>Live observatory:</b> see submission page</span>
+    <span class="chip"><b>Demo video:</b> see submission page</span>
+    <span class="chip"><b>Repo:</b> MIT · one-command reproducer</span>
+  </div>
+  <p class="mut" style="margin-top:28px;font-size:16px">Built on Band as a genuine coordination layer — discover · bid · award · handoff — not a thin wrapper.</p>
+</section>
+
+</body>
+</html>

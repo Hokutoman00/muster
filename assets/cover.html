@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#11151c; --ink:#e7e9ec; --mut:#8b929c;
+    --line:#222831; --accent:#e6a23c; --fail:#c0564b;
+    --mono:'JetBrains Mono','Cascadia Code',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1200px;height:675px}
+  body{
+    background:
+      radial-gradient(1200px 500px at 78% -10%, #161b24 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);font-family:var(--mono);
+    padding:56px 60px;display:flex;flex-direction:column;justify-content:space-between;
+    -webkit-font-smoothing:antialiased;
+  }
+  .kicker{font-size:15px;letter-spacing:.28em;text-transform:uppercase;color:var(--mut)}
+  .kicker b{color:var(--ink);font-weight:600}
+  .title{font-size:118px;font-weight:800;letter-spacing:.02em;line-height:.92;color:var(--accent);margin-top:18px}
+  .title .dot{color:var(--ink)}
+  .sub{font-size:30px;color:var(--ink);margin-top:14px;font-weight:500}
+  .lede{font-size:17px;color:var(--mut);margin-top:16px;max-width:760px;line-height:1.55}
+  .lede em{color:var(--ink);font-style:normal;border-bottom:1px solid var(--line)}
+
+  .mid{display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
+  .metric{
+    background:var(--panel);border:1px solid var(--line);border-radius:3px;
+    padding:18px 26px;min-width:300px;
+  }
+  .metric .lab{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+  .metric .row{display:flex;align-items:baseline;gap:18px;margin-top:8px}
+  .metric .big{font-size:74px;font-weight:800;line-height:1}
+  .metric .naive{color:var(--fail)}
+  .metric .arrow{font-size:34px;color:var(--mut)}
+  .metric .good{color:var(--accent)}
+  .metric .cap{font-size:13px;color:var(--mut);margin-top:10px}
+
+  .right{flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
+  .right .l{font-size:13px;color:var(--mut)}
+  .right .v{font-size:15px;color:var(--ink)}
+
+  .foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .chip{
+    font-size:13px;color:var(--mut);border:1px solid var(--line);
+    border-radius:3px;padding:5px 11px;background:var(--panel);
+  }
+  .chip b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+  <div>
+    <div class="kicker">Band of Agents Hackathon &nbsp;·&nbsp; <b>lablab.ai</b></div>
+    <div class="title">MUSTER<span class="dot">.</span></div>
+    <div class="sub">the war-room that musters its own responders</div>
+    <div class="lede">
+      A Kubernetes incident fires &rarr; MUSTER reads the fault signature and
+      <em>musters a minimal shortlist and keeps only the specialist that incident needs</em>
+      (a real Contract-Net contest over Band's primitives) &rarr; repairs the
+      <em>real cluster with reversible actions</em>,
+      while a human keeps the destructive-op key.
+    </div>
+  </div>
+
+  <div class="mid">
+    <div class="metric">
+      <div class="lab">blast radius · same real fault</div>
+      <div class="row">
+        <span class="big naive">2</span>
+        <span class="arrow">&rarr;</span>
+        <span class="big good">0</span>
+      </div>
+      <div class="cap">naive single-operator &nbsp;vs&nbsp; hardened muster — measured live on a kind cluster</div>
+    </div>
+    <div class="right">
+      <div class="l">coordination</div>
+      <div class="v">Band Contract-Net (FIPA) — discover · bid · award · handoff</div>
+      <div class="l" style="margin-top:6px">safety</div>
+      <div class="v">scope enforced by the Kubernetes API server (403), not by Python</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="chip"><b>Band</b></span>
+    <span class="chip">Contract-Net Protocol</span>
+    <span class="chip"><b>LangGraph</b></span>
+    <span class="chip"><b>CrewAI</b></span>
+    <span class="chip"><b>Pydantic AI</b></span>
+    <span class="chip">Kubernetes RBAC</span>
+    <span class="chip">human-in-the-loop</span>
+  </div>
+</body>
+</html>

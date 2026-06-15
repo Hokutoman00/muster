@@ -1,0 +1,39 @@
+baseline: healthy
+
+=== workload ===
+  injected: set image -> nginx:doesnotexist-9z9z9z
+  incident observed=True unready=1 payments-api.endpoints=2
+  reverted: rollout undo
+  recovered=True
+
+=== network ===
+  injected: patch svc selector -> nonexistent
+  incident observed=True unready=0 checkout-web.endpoints=0
+  reverted: patch svc selector -> app=checkout-web
+  recovered=True
+
+=== data ===
+  injected: patch configmap (remove marker) + rollout restart
+  incident observed=True unready=1 catalog-svc.endpoints=1
+  reverted: restore configmap + rollout restart
+  recovered=True
+
+=== SELFTEST PASS ===
+[
+  {
+    "domain": "workload",
+    "incident_observed": true,
+    "recovered": true
+  },
+  {
+    "domain": "network",
+    "incident_observed": true,
+    "recovered": true
+  },
+  {
+    "domain": "data",
+    "incident_observed": true,
+    "recovered": true
+  }
+]
+exit=0

@@ -1,0 +1,80 @@
+{
+  "spike": "p6-blast-contrast",
+  "claim": "naive-vs-hardened blast radius on the SAME real fault: naive blast=2 (off-limits touched=['deploy/ledger'], recovered=False) vs hardened blast=0 (off-limits touched=[], destructive blocked at human gate=True, recovered=True)",
+  "verdict": {
+    "naive_blast": 2,
+    "hardened_blast": 0,
+    "naive_offlimits_touched": [
+      "deploy/ledger"
+    ],
+    "hardened_offlimits_touched": [],
+    "naive_destructive_unapproved": 1,
+    "hardened_destructive_blocked": 1,
+    "naive_recovered": false,
+    "hardened_recovered": true,
+    "contrast_holds": true
+  },
+  "checks": {
+    "contrast_holds": true,
+    "naive_blast_positive": true,
+    "hardened_blast_zero": true,
+    "naive_touched_offlimits": true,
+    "hardened_spared_offlimits": true,
+    "naive_destructive_unapproved": true,
+    "hardened_destructive_blocked": true,
+    "hardened_recovered": true,
+    "both_restored_to_baseline": true
+  },
+  "naive": {
+    "strategy": "naive",
+    "actions": [
+      "rollout restart deployment --all in ['billing', 'shop'] (no namespace scope -> includes off-limits 'billing')",
+      "scale deploy/payments-api --replicas=0  (DESTRUCTIVE, unapproved)"
+    ],
+    "scoped": false,
+    "human_gate": false,
+    "destructive_unapproved": 1,
+    "destructive_blocked": 0,
+    "restarted_namespaces": [
+      "billing",
+      "shop"
+    ],
+    "incident": {
+      "domain": "workload",
+      "action": "set image -> nginx:doesnotexist-9z9z9z",
+      "deployment": "payments-api"
+    },
+    "incident_observed": true,
+    "blast": 2,
+    "unready_count": 1,
+    "offlimits_touched": [
+      "deploy/ledger"
+    ],
+    "recovered": false,
+    "restored_to_baseline": true
+  },
+  "hardened": {
+    "strategy": "hardened",
+    "actions": [
+      "scale_zero blocked by human-gate (no ack) -> True",
+      "rollout_undo (scoped to deploy/payments-api in 'shop'): rolled deploy/payments-api back to previous ReplicaSet"
+    ],
+    "scoped": true,
+    "human_gate": true,
+    "destructive_unapproved": 0,
+    "destructive_blocked": 1,
+    "restarted_namespaces": [],
+    "incident": {
+      "domain": "workload",
+      "action": "set image -> nginx:doesnotexist-9z9z9z",
+      "deployment": "payments-api"
+    },
+    "incident_observed": true,
+    "blast": 0,
+    "unready_count": 0,
+    "offlimits_touched": [],
+    "recovered": true,
+    "restored_to_baseline": true
+  },
+  "pass": true
+}

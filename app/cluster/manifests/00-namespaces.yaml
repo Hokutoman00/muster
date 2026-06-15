@@ -1,0 +1,14 @@
+# shop  = the demo microservices MUSTER is allowed to remediate.
+# billing = an UNRELATED namespace. A correct (hardened) remediation must NEVER
+#           touch it. The naive control agent does → blast-radius canary.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shop
+  labels: { muster.scope: "remediable" }
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: billing
+  labels: { muster.scope: "off-limits" }

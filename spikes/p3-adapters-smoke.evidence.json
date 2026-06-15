@@ -1,0 +1,38 @@
+{
+  "pass": true,
+  "results": {
+    "workload": {
+      "domain": "workload",
+      "framework": "langgraph",
+      "fit": 1.0,
+      "action": [
+        "rollout_undo"
+      ],
+      "confidence": 0.99,
+      "matches_native": true,
+      "note": "[langgraph] revert a bad rollout to the previous healthy ReplicaSet"
+    },
+    "network": {
+      "domain": "network",
+      "framework": "crewai",
+      "fit": 0.6667,
+      "action": [
+        "restore_selector"
+      ],
+      "confidence": 0.99,
+      "matches_native": true,
+      "note": "[crewai] restore a Service's correct selector to re-attach endpoints"
+    },
+    "data": {
+      "domain": "data",
+      "framework": "pydantic-ai",
+      "fit": 0.6667,
+      "action": [
+        "restore_configmap"
+      ],
+      "confidence": 0.99,
+      "matches_native": true,
+      "note": "[pydantic-ai] restore a corrupted ConfigMap and roll the deployment"
+    }
+  }
+}

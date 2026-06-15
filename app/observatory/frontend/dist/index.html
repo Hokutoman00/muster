@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MUSTER · Live Observatory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0c0d10; --panel:#131419; --line:#23252e; --ink:#e7e7e4;
+    --muted:#8b8d97; --accent:#e8913a; --ok:#5fb37a; --bad:#d6473f;
+    --r:3px; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--mono);
+       font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  header{display:flex;align-items:center;gap:16px;padding:14px 20px;
+         border-bottom:1px solid var(--line)}
+  header h1{font-size:15px;font-weight:700;letter-spacing:.04em;margin:0}
+  header h1 .dim{color:var(--muted);font-weight:400}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);
+       display:inline-block;margin-right:6px}
+  .dot.live{background:var(--ok)}
+  .conn{color:var(--muted);font-size:12px}
+  .spacer{flex:1}
+  .mode{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .seg{border:0;border-radius:0;background:var(--panel);color:var(--muted);
+       padding:7px 12px;font-size:12px;letter-spacing:.02em}
+  .seg:hover:not(.on){color:var(--ink)}
+  .seg.on{background:var(--accent);color:#11120f;font-weight:700}
+  .seg.on.naive{background:var(--bad);color:#fff}
+  body.naive{--accent:var(--bad)}
+  .btns{display:flex;gap:8px}
+  button{font-family:var(--mono);font-size:12px;color:var(--ink);
+         background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+         padding:7px 12px;cursor:pointer;letter-spacing:.02em}
+  button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .grid{display:grid;grid-template-columns:1fr 1fr 360px;gap:1px;
+        background:var(--line);height:calc(100vh - 53px)}
+  .grid>section{background:var(--bg);overflow:auto;padding:16px 18px}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);
+     margin:0 0 14px;font-weight:500}
+
+  /* muster graph */
+  .graph{position:relative;height:300px;margin-bottom:24px}
+  .node{position:absolute;width:128px;padding:9px 11px;border:1px solid var(--line);
+        border-radius:var(--r);background:var(--panel);transition:all .25s}
+  .node .role{font-size:10px;color:var(--muted);text-transform:uppercase;
+              letter-spacing:.1em}
+  .node .name{font-weight:500;margin:2px 0}
+  .node .st{font-size:11px;color:var(--muted)}
+  .node.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .node.active .st{color:var(--accent)}
+  .node.win{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok)}
+  .node.win .st{color:var(--ok)}
+  .node.out{opacity:.38;filter:saturate(.3)}
+  .node.bad .st{color:var(--bad)}
+  svg.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .edge{stroke:var(--line);stroke-width:1.5}
+  .edge.on{stroke:var(--accent)}
+  .edge.win{stroke:var(--ok)}
+
+  /* cluster panes */
+  .ns{margin-bottom:18px;border:1px solid var(--line);border-radius:var(--r);
+      padding:12px}
+  .ns h3{margin:0 0 10px;font-size:12px;font-weight:500;display:flex;
+         justify-content:space-between}
+  .ns h3 .tag{font-size:10px;color:var(--muted);letter-spacing:.08em}
+  .ns.offlimits{border-color:#3a2c2c}
+  .row{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+  .row b{color:var(--ink);font-weight:500}
+  .pill{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px}
+  .pill.ok{background:rgba(95,179,122,.13);color:var(--ok)}
+  .pill.bad{background:rgba(214,71,63,.14);color:var(--bad)}
+  .blast{font-size:30px;font-weight:700;line-height:1}
+  .blast.zero{color:var(--ok)} .blast.hot{color:var(--bad)}
+  .ep{display:flex;gap:6px;align-items:baseline}
+  .ep .n{font-weight:700}
+
+  /* timeline */
+  .tl{display:flex;flex-direction:column-reverse;gap:0}
+  .ev{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+  .ev .t{color:var(--muted);font-size:11px;min-width:58px}
+  .ev .lab{min-width:96px;font-size:11px;letter-spacing:.04em}
+  .ev .body{flex:1;color:var(--ink);word-break:break-word}
+  .lab.fipa{color:var(--accent)} .lab.cluster{color:var(--muted)}
+  .lab.win{color:var(--ok)} .lab.bad{color:var(--bad)}
+
+  /* approval */
+  .approve{margin:0 0 16px;border:1px solid var(--accent);border-radius:var(--r);
+           padding:12px;background:rgba(232,145,58,.07)}
+  .approve.hidden{display:none}
+  .approve .ttl{color:var(--accent);font-weight:500;margin-bottom:6px}
+  .approve .acts{display:flex;gap:8px;margin-top:10px}
+  .legend{color:var(--muted);font-size:11px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>MUSTER <span class="dim">· Live Observatory</span></h1>
+  <span class="conn"><span class="dot" id="dot"></span><span id="conn">connecting…</span></span>
+  <div class="spacer"></div>
+  <div class="mode" id="modeWrap" title="toggle who handles the incident">
+    <button class="seg on" id="modeHardened">hardened muster</button><button class="seg" id="modeNaive">naive control</button>
+  </div>
+  <div class="btns">
+    <button data-d="workload">inject · workload</button>
+    <button data-d="network">inject · network</button>
+    <button data-d="data">inject · data</button>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- left: muster graph + approval -->
+  <section>
+    <h2>Dynamic Muster · Contract-Net</h2>
+    <div id="approve" class="approve hidden">
+      <div class="ttl">⚷ Human approval required</div>
+      <div id="approveBody">A destructive remediation is awaiting your key.</div>
+      <div class="acts">
+        <button id="btnApprove">approve</button>
+        <button id="btnDeny">deny</button>
+      </div>
+    </div>
+    <div class="graph" id="graph">
+      <svg class="edges" id="edges"></svg>
+    </div>
+    <div class="legend">
+      Commander discovers peers, scores capability fit, recruits a shortlist,
+      awards the strongest bid, then de-musters the rest. Reversible tools auto-pass;
+      destructive tools block on the human key.
+    </div>
+  </section>
+
+  <!-- center: cluster state -->
+  <section>
+    <h2>Real Cluster · kind-muster</h2>
+    <div class="ns" id="ns-shop">
+      <h3>namespace: shop <span class="tag">REMEDIABLE</span></h3>
+      <div id="shop-eps"></div>
+      <div class="row"><span>unready pods</span><b id="shop-unready">0</b></div>
+    </div>
+    <div class="ns offlimits">
+      <h3>blast radius <span class="tag">billing = OFF-LIMITS canary</span></h3>
+      <div style="display:flex;align-items:flex-end;gap:12px">
+        <div class="blast zero" id="blast">0</div>
+        <div style="color:var(--muted);padding-bottom:4px">
+          unready + off-limits touches<br/>
+          <span id="blast-note">scoped remediation holds the blast at zero</span>
+        </div>
+      </div>
+    </div>
+    <div class="ns">
+      <h3>current incident</h3>
+      <div class="row"><span>id</span><b id="inc-id">—</b></div>
+      <div class="row"><span>status</span><b id="inc-status">idle</b></div>
+      <div class="row"><span>winner</span><b id="inc-winner">—</b></div>
+    </div>
+  </section>
+
+  <!-- right: timeline -->
+  <section>
+    <h2>Coordination Timeline</h2>
+    <div class="tl" id="tl"></div>
+  </section>
+</div>
+
+<script>
+const NODES = {
+  commander:{role:"manager",name:"muster-commander",fw:"Contract-Net",x:46,y:8},
+  workload:{role:"responder",name:"workload",fw:"LangGraph",x:4,y:62},
+  network:{role:"responder",name:"network",fw:"CrewAI",x:46,y:62},
+  data:{role:"responder",name:"data",fw:"Pydantic AI",x:88,y:62},
+};
+const STATE_LABEL = {
+  idle:"idle", discovered:"discovered", triaging:"triaging",
+  recruited:"recruited · CFP", bid_yes:"bid ✓", bid_no:"no-bid",
+  awarded:"awarded", demustered:"de-mustered", executing:"executing…",
+  executed:"recovered ✓",
+};
+const graphEl = document.getElementById("graph");
+const edgesEl = document.getElementById("edges");
+const nodeEls = {};
+for(const [k,n] of Object.entries(NODES)){
+  const d=document.createElement("div");
+  d.className="node"; d.id="node-"+k;
+  d.style.left=n.x+"%"; d.style.top=n.y+"%";
+  d.innerHTML=`<div class="role">${n.role} · ${n.fw}</div>
+    <div class="name">${n.name}</div><div class="st">idle</div>`;
+  graphEl.appendChild(d); nodeEls[k]=d;
+}
+function center(el){const g=graphEl.getBoundingClientRect(),r=el.getBoundingClientRect();
+  return {x:r.left-g.left+r.width/2, y:r.top-g.top+r.height/2};}
+function drawEdges(graph){
+  edgesEl.innerHTML="";
+  const c=center(nodeEls.commander);
+  for(const k of ["workload","network","data"]){
+    const p=center(nodeEls[k]);
+    const st=(graph[k]||{}).state||"idle";
+    let cls="edge";
+    if(["recruited","bid_yes","bid_no","awarded","executing"].includes(st)) cls+=" on";
+    if(["awarded","executing","executed"].includes(st)) cls+=" win";
+    if(st==="demustered"||st==="idle") cls="edge";
+    edgesEl.insertAdjacentHTML("beforeend",
+      `<line class="${cls}" x1="${c.x}" y1="${c.y}" x2="${p.x}" y2="${p.y}"/>`);
+  }
+}
+function renderGraph(graph){
+  for(const k of Object.keys(NODES)){
+    const g=graph[k]||{state:"idle",detail:""};
+    const el=nodeEls[k];
+    el.className="node";
+    const s=g.state;
+    if(["recruited","bid_yes","bid_no","triaging","discovered","executing"].includes(s)) el.classList.add("active");
+    if(["awarded","executed"].includes(s)) el.classList.add("win");
+    if(s==="demustered") el.classList.add("out");
+    if(s==="bid_no") el.classList.add("bad");
+    el.querySelector(".st").textContent =
+      (STATE_LABEL[s]||s) + (g.detail?` · ${g.detail}`:"");
+  }
+  drawEdges(graph);
+}
+window.addEventListener("resize",()=>drawEdges(lastGraph));
+
+let lastGraph={};
+function renderCluster(c){
+  if(!c) return;
+  const eps=c.endpoints||{};
+  document.getElementById("shop-eps").innerHTML =
+    Object.entries(eps).map(([svc,n])=>{
+      const ok=n>0;
+      return `<div class="row"><span>${svc}</span>
+        <span class="ep"><span class="n">${n}</span>
+        <span class="pill ${ok?'ok':'bad'}">${ok?'endpoints':'blackholed'}</span></span></div>`;
+    }).join("");
+  const unready=(c.unready_pods||[]).length;
+  document.getElementById("shop-unready").textContent=unready;
+  const b=document.getElementById("blast");
+  b.textContent=c.blast??0;
+  b.className="blast "+((c.blast>0)?"hot":"zero");
+  document.getElementById("blast-note").textContent =
+    (c.blast>0)?"fault active — remediation in flight":"scoped remediation holds the blast at zero";
+}
+function renderIncident(i){
+  if(!i) return;
+  document.getElementById("inc-id").textContent=i.incident_id||"—";
+  document.getElementById("inc-status").textContent=i.status||"idle";
+  document.getElementById("inc-winner").textContent=
+    (i.winner||"—").split("/").pop();
+}
+function renderApproval(p){
+  const box=document.getElementById("approve");
+  if(p){
+    box.classList.remove("hidden");
+    document.getElementById("approveBody").innerHTML =
+      `<b>${p.domain}</b> wants to run destructive tool
+       <b>${p.tool}</b> on <b>${p.incident_id}</b>. It will not touch the
+       cluster until you approve.`;
+  } else box.classList.add("hidden");
+}
+
+const FIPA = {discovered:"DISCOVER",triage:"TRIAGE",muster_room:"ANNOUNCE",
+  recruited:"RECRUIT (CFP)",bid:"BID",bids:"COLLECT",awarded:"AWARD",
+  demustered:"DE-MUSTER",executing:"EXECUTE",executed:"RESULT",escalated:"ESCALATE"};
+function ts(t){return new Date((t||Date.now()/1000)*1000).toLocaleTimeString();}
+function addEvent(e){
+  const tl=document.getElementById("tl");
+  let lab="·", body="", cls="";
+  if(e.kind==="phase"){
+    lab=FIPA[e.step]||e.step; cls="fipa";
+    if(e.step==="discovered") body=`peers: ${(e.domains||[]).join(", ")}`;
+    else if(e.step==="triage") body=e.note;
+    else if(e.step==="muster_room") body=`room ${(e.chat_id||"").slice(0,8)} · ${e.title}`;
+    else if(e.step==="recruited") body=`shortlist: ${(e.domains||[]).join(", ")}`;
+    else if(e.step==="bid"){body=e.summary; cls=e.can_handle?"win":"bad";}
+    else if(e.step==="bids") body=`${(e.lines||[]).length} bids collected`;
+    else if(e.step==="awarded"){body=`${(e.winner||"").split("/").pop()} → ${e.tool}`; cls="win";}
+    else if(e.step==="demustered") body=`released: ${(e.domains||[]).join(", ")}`;
+    else if(e.step==="executing") body=`${e.tool}${e.destructive?" (destructive)":""}`;
+    else if(e.step==="executed"){body=e.result; cls=e.ok?"win":"bad";}
+    else if(e.step==="escalated"){body=e.reason; cls="bad";}
+  } else if(e.kind==="incident"){
+    lab=e.phase; cls="cluster";
+    body=Object.entries(e).filter(([k])=>!["kind","id","ts","phase","domain"].includes(k))
+      .map(([k,v])=>`${k}=${v}`).join("  ");
+  } else if(e.kind==="approval"){
+    lab="APPROVAL"; cls=e.decision&&e.decision.includes("approved")?"win":"fipa";
+    body=`${e.tool} → ${e.decision}`;
+  } else return;
+  tl.insertAdjacentHTML("beforeend",
+    `<div class="ev"><span class="t">${ts(e.ts)}</span>
+     <span class="lab ${cls}">${lab}</span><span class="body">${body}</span></div>`);
+  while(tl.children.length>200) tl.removeChild(tl.firstChild);
+}
+
+function applySnapshot(s){
+  if(!s) return;
+  if(s.cluster) renderCluster(s.cluster);
+  if(s.incident){renderIncident(s.incident);}
+  if(s.graph){lastGraph=s.graph; renderGraph(s.graph);}
+  renderApproval(s.pending_approval);
+}
+
+// SSE
+let es;
+function connect(){
+  es=new EventSource("/api/stream");
+  const setLive=v=>{document.getElementById("dot").className="dot"+(v?" live":"");
+    document.getElementById("conn").textContent=v?"live":"reconnecting…";};
+  es.addEventListener("open",()=>setLive(true));
+  es.addEventListener("error",()=>setLive(false));
+  es.addEventListener("state",e=>applySnapshot(JSON.parse(e.data)));
+  es.addEventListener("cluster",e=>{const d=JSON.parse(e.data); renderCluster(d.status);});
+  es.addEventListener("incident",e=>{const d=JSON.parse(e.data); renderIncident(d); addEvent(d);});
+  es.addEventListener("approval",e=>{const d=JSON.parse(e.data);
+    renderApproval(d.resolved?null:d); addEvent(d);});
+  es.addEventListener("phase",e=>{const d=JSON.parse(e.data); addEvent(d);
+    // keep graph live without a full snapshot round-trip
+    fetch("/api/state").then(r=>r.json()).then(s=>{lastGraph=s.graph;renderGraph(s.graph);});});
+}
+connect();
+
+// mode toggle (hardened muster ⇄ naive control) — the judge fires both paths on
+// the SAME workload fault and watches the blast radius diverge.
+let MODE="hardened";
+const mH=document.getElementById("modeHardened"), mN=document.getElementById("modeNaive");
+function applyMode(){
+  const naive = MODE==="naive";
+  document.body.classList.toggle("naive", naive);
+  mH.classList.toggle("on", !naive);
+  mN.classList.toggle("on", naive); mN.classList.toggle("naive", naive);
+  // naive control is the workload-only contrast; disable the others in that mode
+  document.querySelectorAll("button[data-d]").forEach(b=>{
+    const off = naive && b.dataset.d!=="workload";
+    b.disabled = off;
+    b.title = off ? "naive control runs on the workload incident" : "";
+  });
+  document.getElementById("blast-note").textContent = naive
+    ? "naive control: unscoped + no human gate — expect off-limits touches"
+    : "scoped remediation holds the blast at zero";
+}
+mH.addEventListener("click",()=>{MODE="hardened";applyMode();});
+mN.addEventListener("click",()=>{MODE="naive";applyMode();});
+applyMode();
+
+// controls
+document.querySelectorAll("button[data-d]").forEach(b=>{
+  b.addEventListener("click",async()=>{
+    document.querySelectorAll("button[data-d]").forEach(x=>x.disabled=true);
+    try{ await fetch("/api/incident/"+b.dataset.d+"?mode="+MODE,{method:"POST"}); }
+    catch(_){}
+    setTimeout(applyMode, 60000);
+  });
+});
+async function decide(approve){
+  await fetch("/api/approve",{method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({approve})});
+}
+document.getElementById("btnApprove").addEventListener("click",()=>decide(true));
+document.getElementById("btnDeny").addEventListener("click",()=>decide(false));
+</script>
+</body>
+</html>

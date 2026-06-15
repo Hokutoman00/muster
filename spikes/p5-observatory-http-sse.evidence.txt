@@ -1,0 +1,94 @@
+event: state
+data: {"cluster": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}, "incident": {"status": "idle"}, "graph": {"commander": {"state": "idle", "detail": ""}, "workload": {"state": "idle", "detail": ""}, "network": {"state": "idle", "detail": ""}, "data": {"state": "idle", "detail": ""}}, "pending_approval": null}
+
+event: cluster
+data: {"id": 1, "ts": 1781428053.5949292, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 2, "ts": 1781428060.354928, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 3, "ts": 1781428075.9289694, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 4, "ts": 1781428101.6879568, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 5, "ts": 1781428118.446283, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 6, "ts": 1781428137.8314931, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 7, "ts": 1781428154.6035736, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+: keep-alive
+
+event: incident
+data: {"id": 8, "ts": 1781428170.2862582, "kind": "incident", "phase": "start", "domain": "network", "incident_id": "INC-NET", "target": "checkout-web", "status": "injecting"}
+
+event: cluster
+data: {"id": 9, "ts": 1781428172.7766924, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: incident
+data: {"id": 10, "ts": 1781428174.657058, "kind": "incident", "phase": "injected", "domain": "network", "incident_id": "INC-NET", "observed": true, "status": "mustering"}
+
+event: phase
+data: {"id": 11, "ts": 1781428175.311641, "kind": "phase", "step": "discovered", "domains": ["data", "network", "workload"], "n": 3}
+
+event: phase
+data: {"id": 12, "ts": 1781428175.311641, "kind": "phase", "step": "triage", "note": "triage INC-NET sev=high tags=['blackhole', 'endpoints', 'network', 'selector']; capability fit -> network=0.80, data=0.00, workload=0.00"}
+
+event: phase
+data: {"id": 13, "ts": 1781428176.1649384, "kind": "phase", "step": "muster_room", "chat_id": "333379e3-3f15-4fb1-b7e9-cff24b30127e", "title": "MUSTER INC-NW network", "created": false}
+
+event: phase
+data: {"id": 14, "ts": 1781428178.1080608, "kind": "phase", "step": "recruited", "domains": ["network", "data"]}
+
+event: phase
+data: {"id": 15, "ts": 1781428182.7441425, "kind": "phase", "step": "bid", "domain": "network", "can_handle": true, "summary": "@hokutoman00/muster-commander BID fit=0.80 conf=0.99 blast~0 actions=[restore_selector] from=@hokutoman00/network-responder"}
+
+event: phase
+data: {"id": 16, "ts": 1781428184.3694146, "kind": "phase", "step": "bid", "domain": "data", "can_handle": false, "summary": "@hokutoman00/muster-commander NO-BID [pydantic-ai] no in-scope reversible tool for this signature (fit=0.00) from=@hokutoman00/data-responder"}
+
+event: phase
+data: {"id": 17, "ts": 1781428184.6179435, "kind": "phase", "step": "bids", "lines": ["@hokutoman00/muster-commander BID fit=0.80 conf=0.99 blast~0 actions=[restore_selector] from=@hokutoman00/network-responder", "@hokutoman00/muster-commander NO-BID [pydantic-ai] no in-scope reversible tool for this signature (fit=0.00) from=@hokutoman00/data-responder"]}
+
+event: cluster
+data: {"id": 18, "ts": 1781428185.3494935, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 0, "catalog-svc": 2}}}
+
+event: phase
+data: {"id": 19, "ts": 1781428185.4165456, "kind": "phase", "step": "awarded", "winner": "hokutoman00/network-responder", "domain": "network", "tool": "restore_selector"}
+
+event: phase
+data: {"id": 20, "ts": 1781428185.6825466, "kind": "phase", "step": "demustered", "domains": ["data"]}
+
+event: incident
+data: {"id": 21, "ts": 1781428185.6825466, "kind": "incident", "phase": "awarded", "domain": "network", "incident_id": "INC-NET", "winner": "hokutoman00/network-responder", "tool": "restore_selector", "contested": true, "status": "remediating"}
+
+event: phase
+data: {"id": 22, "ts": 1781428185.6825466, "kind": "phase", "step": "executing", "domain": "network", "tool": "restore_selector", "destructive": false}
+
+event: approval
+data: {"id": 23, "ts": 1781428185.6825466, "kind": "approval", "incident_id": "INC-NET", "domain": "network", "tool": "restore_selector", "destructive": false, "auto": true, "resolved": true, "decision": "auto (reversible)"}
+
+event: phase
+data: {"id": 24, "ts": 1781428193.4246862, "kind": "phase", "step": "executed", "domain": "network", "tool": "restore_selector", "result": "restored svc/checkout-web selector -> app=checkout-web", "ok": true}
+
+event: incident
+data: {"id": 25, "ts": 1781428206.3766553, "kind": "incident", "phase": "resolved", "domain": "network", "incident_id": "INC-NET", "recovered": true, "contested": true, "chat_id": "333379e3-3f15-4fb1-b7e9-cff24b30127e", "status": "resolved"}
+
+event: cluster
+data: {"id": 26, "ts": 1781428207.5865917, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 27, "ts": 1781428217.0230176, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+event: cluster
+data: {"id": 28, "ts": 1781428231.379252, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+
+: keep-alive
+
+event: cluster
+data: {"id": 29, "ts": 1781428249.5675325, "kind": "cluster", "status": {"unready_pods": [], "blast": 0, "endpoints": {"payments-api": 2, "checkout-web": 2, "catalog-svc": 2}}}
+

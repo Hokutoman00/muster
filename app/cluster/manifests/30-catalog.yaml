@@ -1,0 +1,54 @@
+# DATA domain target. The app serves content from a ConfigMap and its readiness
+# probe greps for a required marker token. Corrupting the ConfigMap (removing the
+# marker) fails readiness → pods NotReady → Service loses endpoints, WITHOUT any
+# image change. Reversible remediation = restore ConfigMap + `kubectl rollout restart`.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-config
+  namespace: shop
+data:
+  index.html: |
+    MARKER=HEALTHY
+    catalog service config v1 — ok
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-svc
+  namespace: shop
+  labels: { app: catalog-svc, domain: data }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: catalog-svc }
+  template:
+    metadata:
+      labels: { app: catalog-svc, domain: data }
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          ports: [{ containerPort: 80 }]
+          volumeMounts:
+            - { name: config, mountPath: /usr/share/nginx/html }
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "grep -q MARKER=HEALTHY /usr/share/nginx/html/index.html"]
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          resources:
+            requests: { cpu: "10m", memory: "16Mi" }
+            limits: { cpu: "100m", memory: "64Mi" }
+      volumes:
+        - name: config
+          configMap: { name: catalog-config }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-svc
+  namespace: shop
+spec:
+  selector: { app: catalog-svc }
+  ports: [{ port: 80, targetPort: 80 }]

@@ -1,0 +1,221 @@
+{
+  "pass": true,
+  "domain": "workload",
+  "result": {
+    "ok": true,
+    "chat_id": "983379cf-8843-435d-9cd6-29724ff2de38",
+    "domain": "workload"
+  },
+  "checks": {
+    "bid_yes": true,
+    "awarded": true,
+    "demustered": true,
+    "executed": true,
+    "resolved": true,
+    "approval_seen": true,
+    "phase_steps": [
+      "awarded",
+      "bid",
+      "bids",
+      "demustered",
+      "discovered",
+      "executed",
+      "executing",
+      "muster_room",
+      "recruited",
+      "triage"
+    ]
+  },
+  "final_snapshot": {
+    "cluster": null,
+    "incident": {
+      "phase": "resolved",
+      "domain": "workload",
+      "incident_id": "INC-WL",
+      "recovered": true,
+      "contested": true,
+      "chat_id": "983379cf-8843-435d-9cd6-29724ff2de38",
+      "status": "resolved"
+    },
+    "graph": {
+      "commander": {
+        "state": "awarded",
+        "detail": "hokutoman00/workload-responder"
+      },
+      "workload": {
+        "state": "executed",
+        "detail": "rolled deploy/payments-api back to previous ReplicaSet"
+      },
+      "network": {
+        "state": "discovered",
+        "detail": ""
+      },
+      "data": {
+        "state": "demustered",
+        "detail": "released"
+      }
+    },
+    "pending_approval": null
+  },
+  "events": [
+    {
+      "id": 1,
+      "ts": 1781426491.7245228,
+      "kind": "incident",
+      "phase": "start",
+      "domain": "workload",
+      "incident_id": "INC-WL",
+      "target": "payments-api",
+      "status": "injecting"
+    },
+    {
+      "id": 2,
+      "ts": 1781426491.9801288,
+      "kind": "incident",
+      "phase": "injected",
+      "domain": "workload",
+      "incident_id": "INC-WL",
+      "observed": true,
+      "status": "mustering"
+    },
+    {
+      "id": 3,
+      "ts": 1781426492.755835,
+      "kind": "phase",
+      "step": "discovered",
+      "domains": [
+        "data",
+        "network",
+        "workload"
+      ],
+      "n": 3
+    },
+    {
+      "id": 4,
+      "ts": 1781426492.755835,
+      "kind": "phase",
+      "step": "triage",
+      "note": "triage INC-WL sev=high tags=['CrashLoopBackOff', 'rollout', 'workload', 'kubectl.rollout.undo']; capability fit -> workload=0.67, data=0.00, network=0.00"
+    },
+    {
+      "id": 5,
+      "ts": 1781426494.0477676,
+      "kind": "phase",
+      "step": "muster_room",
+      "chat_id": "983379cf-8843-435d-9cd6-29724ff2de38",
+      "title": "MUSTER INC-WL workload",
+      "created": false
+    },
+    {
+      "id": 6,
+      "ts": 1781426496.0839353,
+      "kind": "phase",
+      "step": "recruited",
+      "domains": [
+        "workload",
+        "data"
+      ]
+    },
+    {
+      "id": 7,
+      "ts": 1781426499.5133069,
+      "kind": "phase",
+      "step": "bid",
+      "domain": "workload",
+      "can_handle": true,
+      "summary": "@hokutoman00/muster-commander BID fit=1.00 conf=0.99 blast~0 actions=[rollout_undo] from=@hokutoman00/workload-responder"
+    },
+    {
+      "id": 8,
+      "ts": 1781426502.4676023,
+      "kind": "phase",
+      "step": "bid",
+      "domain": "data",
+      "can_handle": false,
+      "summary": "@hokutoman00/muster-commander NO-BID [pydantic-ai] no in-scope reversible tool for this signature (fit=0.00) from=@hokutoman00/data-responder"
+    },
+    {
+      "id": 9,
+      "ts": 1781426502.7531362,
+      "kind": "phase",
+      "step": "bids",
+      "lines": [
+        "@hokutoman00/muster-commander BID fit=1.00 conf=0.99 blast~0 actions=[rollout_undo] from=@hokutoman00/workload-responder",
+        "@hokutoman00/muster-commander NO-BID [pydantic-ai] no in-scope reversible tool for this signature (fit=0.00) from=@hokutoman00/data-responder"
+      ]
+    },
+    {
+      "id": 10,
+      "ts": 1781426503.5957854,
+      "kind": "phase",
+      "step": "awarded",
+      "winner": "hokutoman00/workload-responder",
+      "domain": "workload",
+      "tool": "rollout_undo"
+    },
+    {
+      "id": 11,
+      "ts": 1781426503.8766801,
+      "kind": "phase",
+      "step": "demustered",
+      "domains": [
+        "data"
+      ]
+    },
+    {
+      "id": 12,
+      "ts": 1781426503.8766801,
+      "kind": "incident",
+      "phase": "awarded",
+      "domain": "workload",
+      "incident_id": "INC-WL",
+      "winner": "hokutoman00/workload-responder",
+      "tool": "rollout_undo",
+      "contested": true,
+      "status": "remediating"
+    },
+    {
+      "id": 13,
+      "ts": 1781426503.8766801,
+      "kind": "phase",
+      "step": "executing",
+      "domain": "workload",
+      "tool": "rollout_undo",
+      "destructive": false
+    },
+    {
+      "id": 14,
+      "ts": 1781426503.8766801,
+      "kind": "approval",
+      "incident_id": "INC-WL",
+      "domain": "workload",
+      "tool": "rollout_undo",
+      "destructive": false,
+      "auto": true,
+      "resolved": true,
+      "decision": "auto (reversible)"
+    },
+    {
+      "id": 15,
+      "ts": 1781426510.5025764,
+      "kind": "phase",
+      "step": "executed",
+      "domain": "workload",
+      "tool": "rollout_undo",
+      "result": "rolled deploy/payments-api back to previous ReplicaSet",
+      "ok": true
+    },
+    {
+      "id": 16,
+      "ts": 1781426519.374329,
+      "kind": "incident",
+      "phase": "resolved",
+      "domain": "workload",
+      "incident_id": "INC-WL",
+      "recovered": true,
+      "contested": true,
+      "chat_id": "983379cf-8843-435d-9cd6-29724ff2de38",
+      "status": "resolved"
+    }
+  ]
+}

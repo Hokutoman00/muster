@@ -1,0 +1,88 @@
+{
+  "spike": "p8-contested-award",
+  "incident": {
+    "incident_id": "INC-CONTESTED-P8",
+    "symptom": [
+      "CrashLoopBackOff",
+      "readiness"
+    ],
+    "scope": [
+      "data"
+    ],
+    "severity": "high",
+    "tags": [
+      "CrashLoopBackOff",
+      "readiness",
+      "data",
+      "configmap"
+    ],
+    "capability_required": [
+      "configmap"
+    ]
+  },
+  "bids": [
+    {
+      "domain": "workload",
+      "responder": "hokutoman00/workload-responder",
+      "framework": "langgraph",
+      "framework_native": true,
+      "can_handle": true,
+      "fit": 0.1429,
+      "confidence": 0.6429,
+      "estimated_blast": 0,
+      "planned_actions": [
+        "rollout_undo"
+      ],
+      "note": "[langgraph] revert a bad rollout to the previous healthy ReplicaSet",
+      "matches_shared_policy": true
+    },
+    {
+      "domain": "network",
+      "responder": "hokutoman00/network-responder",
+      "framework": "crewai",
+      "framework_native": true,
+      "can_handle": false,
+      "fit": 0.0,
+      "confidence": 0.0,
+      "estimated_blast": 0,
+      "planned_actions": [],
+      "note": "[crewai] no in-scope reversible tool",
+      "matches_shared_policy": true
+    },
+    {
+      "domain": "data",
+      "responder": "hokutoman00/data-responder",
+      "framework": "pydantic-ai",
+      "framework_native": true,
+      "can_handle": true,
+      "fit": 0.5,
+      "confidence": 0.99,
+      "estimated_blast": 0,
+      "planned_actions": [
+        "restore_configmap"
+      ],
+      "note": "[pydantic-ai] restore a corrupted ConfigMap and roll the deployment",
+      "matches_shared_policy": true
+    }
+  ],
+  "yes_bids": 2,
+  "no_bids": 1,
+  "award": {
+    "winner": "hokutoman00/data-responder",
+    "winner_framework": "pydantic-ai",
+    "winner_confidence": 0.99,
+    "winner_fit": 0.5,
+    "runner_up": "hokutoman00/workload-responder",
+    "runner_up_confidence": 0.6429,
+    "rule": "highest confidence among handleable bids, tie-broken by lowest blast"
+  },
+  "checks": {
+    "contested_two_handleable": true,
+    "award_discriminated_between_competitors": true,
+    "winner_is_data_correct_root_cause": true,
+    "winner_is_highest_confidence": true,
+    "frameworks_heterogeneous": true,
+    "one_rule_three_runtimes": true
+  },
+  "pass": true
+}

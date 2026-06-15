@@ -1,0 +1,55 @@
+# Real, cluster-enforced RBAC for the hardened responders.
+#
+# The hardened path does NOT run kubectl as cluster-admin. Each remediation is
+# executed under the `responder-shop` ServiceAccount, whose Role lives ONLY in the
+# `shop` namespace. Because the Role is namespaced, the Kubernetes API server
+# itself rejects any attempt to read or mutate the off-limits `billing` namespace
+# with a 403 Forbidden — the blast-radius boundary is enforced by the cluster, not
+# by Python. (An additional application-level allowlist in tools.py narrows each
+# responder further, to its specific (kind,name) resources within shop.)
+#
+# The naive control agent uses the admin context on purpose, which is exactly why
+# it can touch billing and scale-to-zero — that contrast is the point.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: responder-shop
+  namespace: shop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: responder-shop
+  namespace: shop
+rules:
+  # read state to triage / verify recovery
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  # the reversible remediations the responders actually perform
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["patch", "update"]
+  - apiGroups: [""]
+    resources: ["services", "configmaps"]
+    verbs: ["patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: responder-shop
+  namespace: shop
+subjects:
+  - kind: ServiceAccount
+    name: responder-shop
+    namespace: shop
+roleRef:
+  kind: Role
+  name: responder-shop
+  apiGroup: rbac.authorization.k8s.io

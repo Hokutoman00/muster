@@ -1,0 +1,49 @@
+{
+  "spike": "p7-safety-redteam",
+  "cluster": "kind-muster",
+  "RT1_human_gate": {
+    "destructive_no_approval_blocked": true,
+    "blocked_waited_for_human_s": 2.0,
+    "destructive_with_approval_granted": true,
+    "reversible_auto_pass": true,
+    "guarded_run_blocks_destructive": true,
+    "guarded_run_proceeds_with_ack": true,
+    "pass": true
+  },
+  "RT2_rbac_boundary": {
+    "sa_shop_patch_allowed": true,
+    "sa_shop_patch_msg": "ok",
+    "sa_billing_read_allowed": false,
+    "sa_billing_read_msg": "kubectl get deploy -n billing failed: Error from server (Forbidden): deployments.apps is forbidden: User \"system:serviceaccount:shop:responder-shop\" cannot list resource \"deployments\" in API group \"ap",
+    "forbidden_is_api_enforced": true,
+    "admin_billing_read_allowed": true,
+    "boundary_holds": true,
+    "pass": true
+  },
+  "RT3_reversible_invariant": {
+    "shop": {
+      "catalog-svc": [
+        2,
+        2
+      ],
+      "checkout-web": [
+        2,
+        2
+      ],
+      "payments-api": [
+        2,
+        2
+      ]
+    },
+    "billing": {
+      "ledger": [
+        1,
+        1
+      ]
+    },
+    "shop_healthy": true,
+    "billing_healthy": true,
+    "pass": true
+  },
+  "all_pass": true
+}
